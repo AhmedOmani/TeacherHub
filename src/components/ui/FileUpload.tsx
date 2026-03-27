@@ -1,0 +1,118 @@
+import React, { useRef, useState } from 'react';
+import { UploadCloud, Loader2 } from 'lucide-react';
+import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+
+interface FileUploadProps {
+  label: string;
+  value: string;
+  onChange: (url: string) => void;
+}
+
+export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange }) => {
+  const [isUploading, setIsUploading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsUploading(true);
+
+    try {
+      const region = import.meta.env.VITE_AWS_REGION;
+      const bucket = import.meta.env.VITE_AWS_BUCKET_NAME;
+      const accessKeyId = import.meta.env.VITE_AWS_ACCESS_KEY_ID;
+      const secretAccessKey = import.meta.env.VITE_AWS_SECRET_ACCESS_KEY;
+
+      if (!region || !bucket || !accessKeyId || !secretAccessKey) {
+        console.warn('AWS S3 credentials missing. Falling back to base64.');
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          onChange(event.target?.result as string);
+          setIsUploading(false);
+        };
+        reader.onerror = () => setIsUploading(false);
+        reader.readAsDataURL(file);
+        return;
+      }
+
+      const client = new S3Client({
+        region,
+        credentials: {
+          accessKeyId,
+          secretAccessKey,
+        },
+      });
+
+      const extension = file.name.split('.').pop();
+      const fileName = `uploads/${Date.now()}-${Math.random().toString(36).substring(7)}.${extension}`;
+
+      const arrayBuffer = await file.arrayBuffer();
+      const uint8Array = new Uint8Array(arrayBuffer);
+
+      await client.send(
+        new PutObjectCommand({
+          Bucket: bucket,
+          Key: fileName,
+          Body: uint8Array,
+          ContentType: file.type,
+        })
+      );
+
+      const url = `https://${bucket}.s3.${region}.amazonaws.com/${fileName}`;
+      onChange(url);
+    } catch (error: any) {
+      console.error('Upload failed:', error);
+      const errorMsg = error.message || JSON.stringify(error);
+      const errorName = error.name || 'Unknown Error';
+      alert(`خطأ في الرفع:\nالنوع: ${errorName}\nالتفاصيل: ${errorMsg}\n\nيرجى تصوير هذا الخطأ!`);
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col gap-2 mb-4">
+      <div className="flex justify-between items-center">
+        <label className="text-sm font-medium text-text-muted">{label}</label>
+        {value && !isUploading && (
+          <button 
+            title="إزالة هذا الملف"
+            onClick={(e) => { 
+                e.preventDefault();
+                e.stopPropagation(); 
+                onChange(''); 
+            }}
+            className="text-xs font-semibold text-red-500 hover:text-red-600 bg-red-500/10 hover:bg-red-500/20 px-2 py-1 rounded-md transition-colors"
+          >
+            إزالة
+          </button>
+        )}
+      </div>
+      
+      <div 
+        onClick={() => inputRef.current?.click()}
+        className="w-full bg-base border border-dashed border-border-subtle rounded-xl px-4 py-6 text-center 
+        backdrop-blur-md cursor-pointer hover:bg-surface hover:border-electric/50 transition-all flex flex-col items-center justify-center gap-3 group"
+      >
+        <input 
+          type="file" 
+          ref={inputRef}
+          className="hidden" 
+          accept="image/*,video/*,.pdf" 
+          onChange={handleFileChange} 
+        />
+        
+        {isUploading ? (
+           <Loader2 className="animate-spin text-electric" size={24} />
+        ) : (
+           <UploadCloud className="text-text-muted group-hover:text-electric transition-colors" size={24} />
+        )}
+        
+        <div className="text-sm text-text-muted group-hover:text-text-main transition-colors">
+           {value ? 'تم رفع الملف بنجاح (انقر لتغييره)' : 'انقر لرفع ملف'}
+        </div>
+      </div>
+    </div>
+  );
+};

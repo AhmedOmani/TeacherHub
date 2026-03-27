@@ -1,0 +1,35 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Users Collection
+    // - Anyone authenticated can read user docs (useful for future sharing).
+    // - Only the owner can write or modify their own doc.
+    match /users/{userId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == userId;
+    }
+
+    // Pages Collection (The multi-tenant core)
+    match /pages/{pageId} {
+      
+      // READ: 
+      // - The owner can always read their own pages.
+      // - Public visitors can ONLY read the page if `isPublished` is true.
+      allow read: if (request.auth != null && request.auth.uid == resource.data.ownerUid) 
+                  || resource.data.isPublished == true;
+      
+      // CREATE:
+      // - Users must be logged in.
+      // - They can only create a page if they assign themselves as the ownerUid.
+      allow create: if request.auth != null 
+                    && request.auth.uid == request.resource.data.ownerUid;
+      
+      // UPDATE & DELETE:
+      // - Only the existing owner of the document can modify or delete it.
+      allow update, delete: if request.auth != null 
+                            && request.auth.uid == resource.data.ownerUid;
+    }
+  }
+}

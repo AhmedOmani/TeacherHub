@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", "Geist", system-ui, sans-serif;
+  --color-base: var(--bg-base);
+  --color-surface: var(--bg-surface);
+  --color-border-subtle: var(--border-subtle);
+  --color-electric: #8B5CF6;
+}
+
+:root {
+  --bg-base: #f1f5f9;
+  --bg-surface: #ffffff;
+  --border-subtle: rgba(0,0,0,0.1);
+  --text-main: #0f172a;
+  --text-muted: #64748b;
+}
+
+.dark {
+  --bg-base: #0B0E14;
+  --bg-surface: rgba(255, 255, 255, 0.03);
+  --border-subtle: rgba(255, 255, 255, 0.1);
+  --text-main: #F8FAFC;
+  --text-muted: #94a3b8;
+}
+
+body {
+  background-color: var(--bg-base);
+  color: var(--text-main);
+  direction: rtl;
+  margin: 0;
+  font-family: var(--font-sans);
+  overflow: hidden;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
