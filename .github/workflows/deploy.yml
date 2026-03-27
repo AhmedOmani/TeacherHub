@@ -55,4 +55,4 @@ jobs:
           repoToken: '${{ secrets.GITHUB_TOKEN }}'
           firebaseServiceAccount: '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}'
           channelId: live
-          projectId: teacherhub-pro-1a2b3 # <-- UPDATE THIS TO YOUR FIREBASE PROJECT ID
+          projectId: alo-d3cf4
