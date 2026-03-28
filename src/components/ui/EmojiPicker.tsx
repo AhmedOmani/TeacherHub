@@ -54,7 +54,7 @@ export const EmojiPicker: React.FC<EmojiPickerProps> = ({ value, onChange, label
 
       {/* Tooltip for free users */}
       {!isPro && (
-        <div className="absolute top-[calc(100%+8px)] right-0 w-[200px] p-3 bg-surface border border-border-subtle rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all text-center z-50 pointer-events-none">
+        <div className="absolute top-[calc(100%+8px)] right-0 w-[200px] p-3 bg-base border border-border-subtle rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all text-center z-50 pointer-events-none">
           <p className="text-xs font-bold text-electric mb-1 flex items-center justify-center gap-1"><Crown size={12}/> ميزة PRO</p>
           <p className="text-[10px] text-text-muted leading-tight">قم بالترقية لاستخدام مكتبة الرموز التعبيرية المميزة في موقعك.</p>
         </div>
