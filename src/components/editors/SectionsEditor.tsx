@@ -6,10 +6,12 @@ import type { Section, Block, BlockType } from '../../types';
 import { FileUpload } from '../ui/FileUpload';
 import { EmojiPicker } from '../ui/EmojiPicker';
 import { useAuth } from '../../AuthContext';
+import { useWaitlist } from '../../WaitlistContext';
 
 const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: BlockType) => void }) => {
   const [isOpen, setIsOpen] = React.useState(false);
   const { subscriptionStatus } = useAuth();
+  const { openWaitlist } = useWaitlist();
   const isPro = subscriptionStatus === 'pro';
 
   const types = [
@@ -49,9 +51,12 @@ const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: B
                     if (!disabled) {
                       onChange(type.id as BlockType); 
                       setIsOpen(false); 
+                    } else {
+                      openWaitlist(`Premium Block - ${type.label}`);
+                      setIsOpen(false);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-sm transition-colors group relative ${value === type.id ? 'bg-base/50' : ''} ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:bg-base cursor-pointer'}`}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm transition-colors group relative ${value === type.id ? 'bg-base/50' : ''} ${disabled ? 'opacity-80 cursor-pointer hover:bg-surface' : 'hover:bg-base cursor-pointer'}`}
                 >
                   <div className="flex items-center gap-2">
                     <Icon size={16} className={type.color} />

@@ -262,7 +262,7 @@ export function Dashboard() {
               </div>
 
               <button
-                onClick={() => alert('بوابة الدفع قريباً جداً! 🎉 سيتم تفعيل ميزة الاشتراكات قريبًا.')}
+                onClick={() => openWaitlist('Dashboard Pro Card')}
                 className="w-full py-4 bg-electric text-white font-black rounded-xl shadow-xl hover:shadow-electric/20 hover:scale-[1.02] active:scale-[0.98] transition-all text-lg flex justify-center items-center gap-2"
               >
                 <Sparkles size={20} /> الترقية الآن

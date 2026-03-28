@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider } from './AuthContext';
+import { WaitlistProvider } from './WaitlistContext';
 import { Loader2 } from 'lucide-react';
 
 const Editor = lazy(() => import('./pages/Editor').then(m => ({ default: m.Editor })));
@@ -21,21 +22,23 @@ function App() {
 
   return (
     <AuthProvider>
-      <BrowserRouter>
-        <Suspense fallback={<LoadingScreen />}>
-          <Routes>
-            {/* Legacy Support */}
-            {isLegacyViewMode && <Route path="*" element={<Viewer />} />}
-            
-            <Route path="/" element={<Editor />} />
-            <Route path="/login" element={<Login />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/editor/:pageId" element={<Editor />} />
-            <Route path="/view/:slug" element={<Viewer />} />
-            <Route path="*" element={<Navigate to="/" replace />} />
-          </Routes>
-        </Suspense>
-      </BrowserRouter>
+      <WaitlistProvider>
+        <BrowserRouter>
+          <Suspense fallback={<LoadingScreen />}>
+            <Routes>
+              {/* Legacy Support */}
+              {isLegacyViewMode && <Route path="*" element={<Viewer />} />}
+              
+              <Route path="/" element={<Editor />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/dashboard" element={<Dashboard />} />
+              <Route path="/editor/:pageId" element={<Editor />} />
+              <Route path="/view/:slug" element={<Viewer />} />
+              <Route path="*" element={<Navigate to="/" replace />} />
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
+      </WaitlistProvider>
     </AuthProvider>
   );
 }

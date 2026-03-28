@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { SmilePlus, Crown, Lock } from 'lucide-react';
 import { useAuth } from '../../AuthContext';
+import { useWaitlist } from '../../WaitlistContext';
 
 const COMMON_EMOJIS = [
   // Education & School
@@ -26,6 +27,7 @@ export const EmojiPicker: React.FC<EmojiPickerProps> = ({ value, onChange, label
   const [isOpen, setIsOpen] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
   const { subscriptionStatus } = useAuth();
+  const { openWaitlist } = useWaitlist();
   const isPro = subscriptionStatus === 'pro';
 
   useEffect(() => {
@@ -48,8 +50,9 @@ export const EmojiPicker: React.FC<EmojiPickerProps> = ({ value, onChange, label
         onMouseEnter={() => { if (!isPro) setIsOpen(false); }}
         onClick={() => {
           if (isPro) setIsOpen(!isOpen);
+          else openWaitlist('Emoji Picker');
         }}
-        className={`h-[46px] w-[60px] flex items-center justify-center bg-base border border-border-subtle rounded-xl transition-colors text-2xl group relative ${isPro ? 'hover:border-electric cursor-pointer' : 'opacity-70 cursor-not-allowed'}`}
+        className={`h-[46px] w-[60px] flex items-center justify-center bg-base border border-border-subtle rounded-xl transition-colors text-2xl group relative ${isPro ? 'hover:border-electric cursor-pointer' : 'cursor-pointer hover:border-border-muted bg-surface/50'}`}
       >
         {value || <SmilePlus size={20} className={`text-text-muted transition-colors ${isPro ? 'group-hover:text-electric' : ''}`} />}
         {!isPro && (

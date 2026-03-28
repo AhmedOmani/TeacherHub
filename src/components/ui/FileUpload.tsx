@@ -2,6 +2,7 @@ import React, { useRef, useState } from 'react';
 import { UploadCloud, Loader2, Crown, Lock } from 'lucide-react';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
 import { useAuth } from '../../AuthContext';
+import { useWaitlist } from '../../WaitlistContext';
 
 interface FileUploadProps {
   label: string;
@@ -15,6 +16,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange, 
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
   const { subscriptionStatus } = useAuth();
+  const { openWaitlist } = useWaitlist();
   
   const isPro = subscriptionStatus === 'pro';
   const disabled = isPremium && !isPro;
@@ -109,10 +111,11 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange, 
         <div 
           onClick={() => {
             if (!disabled) inputRef.current?.click();
+            else openWaitlist(`File Upload - ${label}`);
           }}
           className={`w-full bg-base border border-dashed border-border-subtle rounded-xl px-4 py-6 text-center 
           backdrop-blur-md flex flex-col items-center justify-center gap-3 transition-all
-          ${disabled ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-surface hover:border-electric/50'}`}
+          ${disabled ? 'cursor-pointer hover:bg-surface/50 opacity-80' : 'cursor-pointer hover:bg-surface hover:border-electric/50'}`}
         >
           {disabled && (
             <div className="absolute top-2 right-2">
