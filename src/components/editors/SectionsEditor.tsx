@@ -1,20 +1,24 @@
 import React from 'react';
 import { useConfig } from '../../ConfigContext';
 import { Input } from '../ui/Input';
-import { Plus, Trash2, Link, PlaySquare, FileText, Palette, ChevronDown, Film } from 'lucide-react';
+import { Plus, Trash2, Link, PlaySquare, FileText, Palette, ChevronDown, Film, Crown, Lock } from 'lucide-react';
 import type { Section, Block, BlockType } from '../../types';
 import { FileUpload } from '../ui/FileUpload';
 import { EmojiPicker } from '../ui/EmojiPicker';
+import { useAuth } from '../../AuthContext';
 
 const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: BlockType) => void }) => {
   const [isOpen, setIsOpen] = React.useState(false);
+  const { subscriptionStatus } = useAuth();
+  const isPro = subscriptionStatus === 'pro';
+
   const types = [
     { id: 'link', icon: Link, label: 'رابط عادي', color: 'text-blue-400' },
     { id: 'youtube', icon: PlaySquare, label: 'يوتيوب', color: 'text-red-500' },
     { id: 'google-form', icon: FileText, label: 'نموذج جوجل', color: 'text-emerald-500' },
     { id: 'canva', icon: Palette, label: 'تصميم كانفا', color: 'text-purple-400' },
-    { id: 'video', icon: Film, label: 'فيديو خاص', color: 'text-orange-500' },
-    { id: 'document', icon: FileText, label: 'ملف (PPTX/DOCX/PDF)', color: 'text-cyan-400' },
+    { id: 'video', icon: Film, label: 'فيديو خاص', color: 'text-orange-500', isPremium: true },
+    { id: 'document', icon: FileText, label: 'ملف (PPTX/DOCX/PDF)', color: 'text-cyan-400', isPremium: true },
   ];
   
   const selected = types.find(t => t.id === value) || types[0];
@@ -34,17 +38,36 @@ const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: B
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full right-0 mt-2 min-w-[220px] bg-base border border-border-subtle rounded-xl shadow-xl z-50 overflow-hidden py-1">
+          <div className="absolute top-full right-0 mt-2 min-w-[220px] bg-base border border-border-subtle rounded-xl shadow-xl z-50 py-1 animate-in fade-in zoom-in-95 duration-200">
             {types.map(type => {
               const Icon = type.icon;
+              const disabled = type.isPremium && !isPro;
               return (
                 <button
                   key={type.id}
-                  onClick={() => { onChange(type.id as BlockType); setIsOpen(false); }}
-                  className={`w-full flex items-center gap-2 px-3 py-2 text-sm transition-colors hover:bg-base ${value === type.id ? 'bg-base/50' : ''}`}
+                  onClick={() => { 
+                    if (!disabled) {
+                      onChange(type.id as BlockType); 
+                      setIsOpen(false); 
+                    }
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm transition-colors group relative ${value === type.id ? 'bg-base/50' : ''} ${disabled ? 'opacity-60 cursor-not-allowed' : 'hover:bg-base cursor-pointer'}`}
                 >
-                  <Icon size={16} className={type.color} />
-                  <span className="text-text-main">{type.label}</span>
+                  <div className="flex items-center gap-2">
+                    <Icon size={16} className={type.color} />
+                    <span className="text-text-main">{type.label}</span>
+                  </div>
+                  {type.isPremium && (
+                    <div className="flex items-center">
+                      {isPro ? <Crown size={12} className="text-electric/50" /> : <Lock size={12} className="text-text-muted" />}
+                    </div>
+                  )}
+                  {disabled && (
+                    <div className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 w-[200px] p-3 bg-base border border-border-subtle rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all text-center z-50 pointer-events-none">
+                       <p className="text-xs font-bold text-electric mb-1 flex items-center justify-center gap-1"><Crown size={12}/> ميزة PRO</p>
+                       <p className="text-[10px] text-text-muted leading-tight">الرفع المباشر (S3) متاح في الباقة المدفوعة.</p>
+                    </div>
+                  )}
                 </button>
               )
             })}
