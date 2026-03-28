@@ -116,6 +116,12 @@ export function Dashboard() {
   };
 
   const handleDelete = async (pageId: string) => {
+    if (userLimits.subscriptionStatus === 'free') {
+       alert('عذراً، حذف المواقع لإنشاء مساحات جديدة غير متاح في الخطة المجانية لضمان استقرار روابط طلابك.\n\nيمكنك تعديل موقعك الحالي بدلاً من ذلك، أو الترقية لـ PRO للتمتع بمواقع غير محدودة!');
+       setShowProModal(true);
+       return;
+    }
+
     if (!window.confirm('هل أنت متأكد من حذف هذا الموقع نهائياً؟')) return;
     setDeletingId(pageId);
     try {
