@@ -230,7 +230,7 @@ export function Dashboard() {
             
             <button 
               onClick={() => setShowProModal(false)}
-              className="absolute top-4 left-4 sm:right-4 sm:left-auto p-2 bg-black/20 hover:bg-black/40 rounded-full text-white/70 hover:text-white transition-colors z-20"
+              className="absolute top-4 left-4 sm:right-4 sm:left-auto p-2 bg-surface hover:bg-base border border-border-subtle rounded-full text-text-muted hover:text-text-main transition-colors z-20"
             >
               <X size={20} />
             </button>
@@ -240,7 +240,7 @@ export function Dashboard() {
                 <Gem className="text-white drop-shadow-lg" size={48} />
               </div>
               
-              <h2 className="text-3xl font-extrabold text-white mb-3 tracking-wide transform">ارتقِ بمنصتك <span className="text-transparent bg-clip-text bg-gradient-to-l from-pink-400 to-electric">PRO</span></h2>
+              <h2 className="text-3xl font-extrabold text-text-main mb-3 tracking-wide transform">ارتقِ بمنصتك <span className="text-transparent bg-clip-text bg-gradient-to-l from-pink-400 to-electric">PRO</span></h2>
               <p className="text-text-muted text-sm mb-8 leading-relaxed">
                  لقد وصلت للحد الأقصى (صفحة واحدة) في الخطة المجانية. اشترك في TeacherHub PRO الآن وحلّق بإبداعك بلا حدود!
               </p>
@@ -252,7 +252,7 @@ export function Dashboard() {
                   'رفع ملفات وصور بجودة أعلى (قريباً)',
                   'أولوية الدعم الفني والحماية المتقدمة'
                 ].map((feature, i) => (
-                  <div key={i} className="flex items-center gap-3 text-sm font-medium text-white/90 bg-white/5 p-4 rounded-xl border border-white/5 shadow-sm">
+                  <div key={i} className="flex items-center gap-3 text-sm font-medium text-text-main bg-base p-4 rounded-xl border border-border-subtle shadow-sm">
                     <div className="w-6 h-6 rounded-full bg-gradient-to-br from-green-400 to-emerald-600 flex items-center justify-center shrink-0 shadow-inner">
                       <Check size={14} className="text-white absolute" strokeWidth={3} />
                     </div>
@@ -263,7 +263,7 @@ export function Dashboard() {
 
               <button 
                 onClick={() => alert('بوابة الدفع قريباً جداً! 🎉 سيتم تفعيل ميزة الاشتراكات قريبًا.')}
-                className="w-full py-4 bg-white text-electric font-black rounded-xl shadow-xl hover:shadow-white/20 hover:scale-[1.02] active:scale-[0.98] transition-all text-lg flex justify-center items-center gap-2"
+                className="w-full py-4 bg-electric text-white font-black rounded-xl shadow-xl hover:shadow-electric/20 hover:scale-[1.02] active:scale-[0.98] transition-all text-lg flex justify-center items-center gap-2"
               >
                 <Sparkles size={20} /> الترقية الآن 
               </button>
