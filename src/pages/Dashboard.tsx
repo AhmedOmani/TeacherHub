@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
+import { useWaitlist } from '../WaitlistContext';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
 import { Plus, LayoutTemplate, LogOut, ExternalLink, PenBox, Loader2, Trash2, Edit2, Check, X, Sparkles, Gem, Camera } from 'lucide-react';
@@ -24,6 +25,7 @@ interface UserLimits {
 
 export function Dashboard() {
   const { user, loading: authLoading, logout } = useAuth();
+  const { openWaitlist } = useWaitlist();
   const navigate = useNavigate();
   const [pages, setPages] = useState<PageDoc[]>([]);
   const [loading, setLoading] = useState(true);
