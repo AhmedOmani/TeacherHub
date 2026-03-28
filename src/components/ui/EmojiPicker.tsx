@@ -3,10 +3,17 @@ import { SmilePlus, Crown, Lock } from 'lucide-react';
 import { useAuth } from '../../AuthContext';
 
 const COMMON_EMOJIS = [
-  '📚', '📖', '📝', '✏️', '🎓', '🏆', '⭐', '💡',
-  '🔍', '🔬', '💻', '🎬', '🎧', '🎯', '🧩', '🎨',
-  '⚽', '🚀', '🌟', '🔥', '✨', '✅', '👋', '👍',
-  '💪', '🧠', '🗣️', '🌍', '📊', '📈', '💼', '📌'
+  // Education & School
+  '📚', '📖', '📝', '✏️', '🎓', '🏆', '⭐', '💡', '🔍', '🔬', '💻', '🎒', '📏', '📐', '✂️', '📋',
+  // Creative & Arts
+  '🎨', '🎭', '🎬', '🎧', '📸', '🎵', '🎹', '🖍️', 
+  // Nature & Animals
+  '🌍', '☀️', '🌙', '⭐', '🌈', '🌧️', '❄️', '🌿', '🌱', '🌺', '🌲', 
+  '🐶', '🐱', '🐭', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐸', '🐵', '🦉', '🦋', '🐢', '🦖',
+  // Sports & Activities
+  '⚽', '🏀', '🏈', '⚾', '🎾', '🏐', '🏉', '🎱', '🏓', '🏸', '🏒', '🥊', '🎯', '🧩', '🚀', '🏎️', '✈️',
+  // Reactions & Symbols
+  '🔥', '✨', '✅', '👋', '👍', '💪', '🧠', '🗣️', '👏', '🙌', '👀', '💯', '🎈', '🎉', '🌟', '💼', '📌', '📊', '📈'
 ];
 
 interface EmojiPickerProps {
@@ -61,14 +68,14 @@ export const EmojiPicker: React.FC<EmojiPickerProps> = ({ value, onChange, label
       )}
 
       {isOpen && isPro && (
-        <div className="absolute top-[calc(100%+8px)] right-0 w-[280px] bg-base border border-border-subtle rounded-xl shadow-2xl z-50 p-3 animate-in fade-in zoom-in-95 duration-200">
+        <div className="absolute top-[calc(100%+8px)] right-0 w-[320px] bg-base border border-border-subtle rounded-xl shadow-2xl z-50 p-3 animate-in fade-in zoom-in-95 duration-200">
           <div className="flex items-center justify-between mb-3 px-1">
             <span className="text-xs font-medium text-text-muted">اختر رمزاً</span>
             <span className="text-[10px] text-electric uppercase font-bold tracking-wider px-2 py-0.5 rounded flex items-center gap-1 bg-electric/10">
               <Crown size={10} /> Pro
             </span>
           </div>
-          <div className="grid grid-cols-8 gap-1">
+          <div className="grid grid-cols-8 gap-1 max-h-[200px] overflow-y-auto overflow-x-hidden pr-1">
             {COMMON_EMOJIS.map(emoji => (
               <button
                 key={emoji}
