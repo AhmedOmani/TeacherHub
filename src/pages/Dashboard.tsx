@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../AuthContext';
 import { db } from '../lib/firebase';
 import { collection, query, where, getDocs, addDoc, serverTimestamp, doc, updateDoc, deleteDoc, getDoc } from 'firebase/firestore';
-import { Plus, LayoutTemplate, LogOut, ExternalLink, PenBox, Loader2, Trash2, Edit2, Check, X, Sparkles, Gem } from 'lucide-react';
+import { Plus, LayoutTemplate, LogOut, ExternalLink, PenBox, Loader2, Trash2, Edit2, Check, X, Sparkles, Gem, Camera } from 'lucide-react';
 import { defaultConfig } from '../types';
 import { ThemeToggle } from '../components/ThemeToggle';
+import { FileUpload } from '../components/ui/FileUpload';
 
 interface PageDoc {
   id: string;
@@ -18,6 +19,7 @@ interface PageDoc {
 interface UserLimits {
   subscriptionStatus: string;
   maxPages: number;
+  globalAvatar?: string;
 }
 
 export function Dashboard() {
@@ -33,6 +35,7 @@ export function Dashboard() {
   // PRO Auth Limits
   const [userLimits, setUserLimits] = useState<UserLimits>({ subscriptionStatus: 'free', maxPages: 1 });
   const [showProModal, setShowProModal] = useState(false);
+  const [showAvatarModal, setShowAvatarModal] = useState(false);
 
   useEffect(() => {
     if (!authLoading && !user) navigate('/login');
@@ -46,9 +49,11 @@ export function Dashboard() {
         const userDocRef = await getDoc(doc(db, 'users', user.uid));
         if (userDocRef.exists()) {
           const data = userDocRef.data() as any;
-          if (data.limits) {
-             setUserLimits({ subscriptionStatus: data.subscriptionStatus || 'free', maxPages: data.limits.maxPages || 1 });
-          }
+          setUserLimits({ 
+            subscriptionStatus: data.subscriptionStatus || 'free', 
+            maxPages: data.limits?.maxPages || 1,
+            globalAvatar: data.globalAvatar
+          });
         }
         
         // Fetch Pages
@@ -95,7 +100,13 @@ export function Dashboard() {
         isPublished: false,
         createdAt: serverTimestamp(),
         updatedAt: serverTimestamp(),
-        config: defaultConfig
+        config: {
+          ...defaultConfig,
+          hero: {
+            ...defaultConfig.hero,
+            avatar: userLimits.globalAvatar || defaultConfig.hero.avatar
+          }
+        }
       });
       navigate(`/editor/${docRef.id}`);
     } catch (err) {
@@ -154,6 +165,55 @@ export function Dashboard() {
       <div className="absolute top-[-10%] sm:top-[-20%] right-[-10%] sm:right-[-5%] w-[50vw] sm:w-[30vw] h-[50vw] sm:h-[30vw] rounded-full bg-electric/30 blur-[100px] pointer-events-none animate-pulse" />
       <div className="absolute bottom-[-10%] left-[-10%] sm:left-[-5%] w-[50vw] sm:w-[30vw] h-[50vw] sm:h-[30vw] rounded-full bg-purple-500/20 blur-[100px] pointer-events-none animate-pulse" />
 
+      {/* Global Avatar Settings Modal */}
+      {showAvatarModal && (
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4" dir="rtl">
+          <div className="absolute inset-0 bg-black/60 backdrop-blur-md" onClick={() => setShowAvatarModal(false)} />
+          <div className="relative w-full max-w-md bg-surface/90 backdrop-blur-2xl border border-border-subtle shadow-2xl rounded-3xl overflow-hidden animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-border-subtle bg-base/80">
+              <h3 className="text-xl font-bold text-text-main flex items-center gap-3">
+                <Camera className="text-electric" size={24} /> 
+                الصورة الشخصية
+              </h3>
+              <button 
+                onClick={() => setShowAvatarModal(false)}
+                className="p-2 bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white rounded-xl transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-6">
+              <p className="text-sm text-text-muted mb-6">
+                 قم بتعيين صورة شخصية لك. هذه الصورة ستظهر تلقائياً كصورة رئيسية في أي <span className="text-electric font-bold">موقع جديد</span> تقوم بإنشائه مستقبلاً.
+              </p>
+              
+              <FileUpload 
+                label="ارفع صورتك (مدعوم S3)"
+                value={userLimits.globalAvatar || ''}
+                accept="image/*"
+                onChange={async (url) => {
+                   if (!user) return;
+                   // Optimistic update
+                   setUserLimits(prev => ({ ...prev, globalAvatar: url }));
+                   try {
+                     await updateDoc(doc(db, 'users', user.uid), { globalAvatar: url });
+                   } catch (e) {
+                     console.error("Error saving global avatar", e);
+                   }
+                }}
+              />
+              
+              <button 
+                onClick={() => setShowAvatarModal(false)}
+                className="w-full mt-4 py-3 bg-base border border-border-subtle hover:bg-surface text-text-main font-bold rounded-xl transition-colors"
+              >
+                إغلاق و حفظ
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* PRO Upgrade Modal */}
       {showProModal && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6" dir="rtl">
@@ -210,8 +270,19 @@ export function Dashboard() {
       <nav className="border-b border-border-subtle bg-surface/50 backdrop-blur-xl sticky top-0 z-50">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between relative z-10">
           <div className="flex items-center gap-3">
-             <div className="w-10 h-10 rounded-xl outline-none bg-electric flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-electric/20">
-               TH
+             <div 
+               onClick={() => setShowAvatarModal(true)}
+               className="w-10 h-10 rounded-xl outline-none bg-electric flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-electric/20 cursor-pointer overflow-hidden border-2 border-transparent hover:border-white/50 transition-all group relative"
+               title="تغيير الصورة الشخصية"
+             >
+               {userLimits.globalAvatar ? (
+                 <img src={userLimits.globalAvatar} alt="Profile" className="w-full h-full object-cover" />
+               ) : (
+                 'TH'
+               )}
+               <div className="absolute inset-0 bg-black/50 text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                  <Camera size={16} />
+               </div>
              </div>
              <h1 className="text-2xl font-bold tracking-tight text-text-main hidden sm:block">Teacher<span className="text-electric">Hub</span> <span className="text-xs text-electric px-2 py-0.5 border border-electric/30 bg-electric/10 rounded-full align-top ml-2">PRO</span></h1>
           </div>
