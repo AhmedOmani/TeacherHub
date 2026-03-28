@@ -68,7 +68,7 @@ export const WaitlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             
             <button 
               onClick={() => setIsOpen(false)}
-              className="absolute top-4 right-4 p-2 text-text-muted hover:text-white bg-base hover:bg-white/10 rounded-full transition-colors z-10"
+              className="absolute top-4 right-4 p-2 text-text-muted hover:text-slate-900 dark:hover:text-white bg-base hover:bg-slate-200 dark:hover:bg-white/10 rounded-full transition-colors z-10"
             >
               <X size={20} />
             </button>
@@ -77,7 +77,7 @@ export const WaitlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
               <div className="w-16 h-16 bg-gradient-to-br from-purple-500/20 to-electric/20 rounded-2xl flex items-center justify-center mx-auto mb-4 border border-electric/30 shadow-inner">
                 <Crown className="text-electric" size={32} />
               </div>
-              <h2 className="text-2xl font-extrabold text-white mb-2">TeacherHub <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric to-pink-500">PRO</span></h2>
+              <h2 className="text-2xl font-extrabold text-slate-900 dark:text-white mb-2">TeacherHub <span className="text-transparent bg-clip-text bg-gradient-to-r from-electric to-pink-500">PRO</span></h2>
               <p className="text-text-muted text-sm leading-relaxed">
                 هذه الميزة متاحة في النسخة الاحترافية (قريباً).
                 <br />انضم لقائمة الانتظار الآن واحصل على <span className="text-electric font-bold">خصم 50%</span> عند الإطلاق!
@@ -89,11 +89,11 @@ export const WaitlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                 <div className="w-12 h-12 bg-emerald-500 rounded-full flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/20">
                   <Check size={24} className="text-white" strokeWidth={3} />
                 </div>
-                <h3 className="text-lg font-bold text-emerald-400 mb-1">تم تسجيلك بنجاح! 🎉</h3>
+                <h3 className="text-lg font-bold text-emerald-500 dark:text-emerald-400 mb-1">تم تسجيلك بنجاح! 🎉</h3>
                 <p className="text-text-muted text-sm">سنقوم بمراسلتك فور إطلاق النسخة الاحترافية لحجز مقعدك.</p>
                 <button 
                   onClick={() => setIsOpen(false)}
-                  className="mt-6 w-full py-3 bg-base hover:bg-white/5 border border-border-subtle text-white font-medium rounded-xl transition-all"
+                  className="mt-6 w-full py-3 bg-base hover:bg-slate-100 dark:hover:bg-white/5 border border-border-subtle text-slate-900 dark:text-white font-medium rounded-xl transition-all"
                 >
                   العودة للمنصة
                 </button>
@@ -110,7 +110,7 @@ export const WaitlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="teacher@school.com"
-                    className="w-full bg-base border border-border-subtle focus:border-electric rounded-xl px-4 py-3 text-white outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-right"
+                    className="w-full bg-base border border-border-subtle focus:border-electric rounded-xl px-4 py-3 text-slate-900 dark:text-white outline-none transition-all placeholder:text-text-muted/50 disabled:opacity-50 text-right"
                   />
                 </div>
                 
