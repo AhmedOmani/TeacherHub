@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useConfig } from '../ConfigContext';
-import { Video, Link as LinkIcon, FormInput, MonitorPlay, Film, X, ExternalLink } from 'lucide-react';
+import { Video, Link as LinkIcon, FormInput, MonitorPlay, Film, X, ExternalLink, FileText } from 'lucide-react';
 import type { Block } from '../types';
 
 export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false }) => {
@@ -14,6 +14,7 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
       case 'google-form': return <FormInput className="text-emerald-500" size={24} />;
       case 'canva': return <MonitorPlay className="text-purple-400" size={24} />;
       case 'video': return <Film className="text-orange-500" size={24} />;
+      case 'document': return <FileText className="text-cyan-400" size={24} />;
       default: return <LinkIcon className="text-blue-400" size={24} />;
     }
   };
@@ -91,7 +92,7 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => {
-                          if (block.type === 'youtube' || block.type === 'video') {
+                          if (block.type === 'youtube' || block.type === 'video' || block.type === 'document') {
                             e.preventDefault();
                             if (block.url) setActiveBlock(block);
                           }
@@ -169,6 +170,14 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
                 <video src={activeBlock.url} controls autoPlay className="w-full h-full object-contain" />
               ) : activeBlock.type === 'google-form' ? (
                 <iframe src={activeBlock.url.includes('?') ? `${activeBlock.url}&embedded=true` : `${activeBlock.url}?embedded=true`} className="w-full h-full border-0 bg-white" allowFullScreen />
+              ) : activeBlock.type === 'document' ? (
+                <iframe 
+                  src={/\.(pptx?|docx?|xlsx?)$/i.test(activeBlock.url) 
+                    ? `https://view.officeapps.live.com/op/embed.aspx?src=${encodeURIComponent(activeBlock.url)}` 
+                    : activeBlock.url} 
+                  className="w-full h-full border-0 bg-white" 
+                  allowFullScreen 
+                />
               ) : (
                 <iframe src={activeBlock.url} className="w-full h-full border-0 bg-white" allowFullScreen />
               )}

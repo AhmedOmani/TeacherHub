@@ -6,15 +6,24 @@ interface FileUploadProps {
   label: string;
   value: string;
   onChange: (url: string) => void;
+  accept?: string;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange, accept }) => {
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
+    // Strict 10MB Limit
+    const MAX_SIZE_MB = 10;
+    if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+      alert(`عذراً، حجم الملف يجب أن لا يتجاوز 10 ميجابايت.\nحجم ملفك هو ${(file.size / 1024 / 1024).toFixed(1)} ميجابايت.`);
+      if (inputRef.current) inputRef.current.value = ''; // Reset input
+      return;
+    }
 
     setIsUploading(true);
 
@@ -99,7 +108,7 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange }
           type="file" 
           ref={inputRef}
           className="hidden" 
-          accept="image/*,video/*,.pdf" 
+          accept={accept || "image/*,video/*,.pdf"} 
           onChange={handleFileChange} 
         />
         

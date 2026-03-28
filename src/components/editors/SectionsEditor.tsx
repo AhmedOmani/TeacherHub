@@ -13,6 +13,7 @@ const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: B
     { id: 'google-form', icon: FileText, label: 'نموذج جوجل', color: 'text-emerald-500' },
     { id: 'canva', icon: Palette, label: 'تصميم كانفا', color: 'text-purple-400' },
     { id: 'video', icon: Film, label: 'فيديو خاص', color: 'text-orange-500' },
+    { id: 'document', icon: FileText, label: 'ملف (PPTX/DOCX/PDF)', color: 'text-cyan-400' },
   ];
   
   const selected = types.find(t => t.id === value) || types[0];
@@ -184,11 +185,13 @@ export const SectionsEditor: React.FC = () => {
                   className="mb-0"
                 />
                 
-                {block.type === 'video' ? (
+                
+                {block.type === 'video' || block.type === 'document' ? (
                   <FileUpload 
-                    label="ملف الفيديو (S3)"
+                    label={block.type === 'video' ? 'ملف الفيديو (S3)' : 'ارفع الملف (PPTX, DOCX, PDF) - أقصى حد 10 ميجا'}
                     value={block.url}
                     onChange={(url) => updateBlock(section.id, block.id, 'url', url)}
+                    accept={block.type === 'video' ? 'video/*' : '.pdf,.doc,.docx,.ppt,.pptx'}
                   />
                 ) : (
                   <Input

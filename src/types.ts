@@ -1,4 +1,4 @@
-export type BlockType = 'youtube' | 'link' | 'google-form' | 'canva' | 'video';
+export type BlockType = 'youtube' | 'link' | 'google-form' | 'canva' | 'video' | 'document';
 
 export interface Block {
   id: string;
