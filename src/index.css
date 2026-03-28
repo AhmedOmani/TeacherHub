@@ -6,6 +6,8 @@
   --color-surface: var(--bg-surface);
   --color-border-subtle: var(--border-subtle);
   --color-electric: #8B5CF6;
+  --color-text-main: var(--text-main);
+  --color-text-muted: var(--text-muted);
 }
 
 :root {
