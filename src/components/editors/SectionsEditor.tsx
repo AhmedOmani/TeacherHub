@@ -33,7 +33,7 @@ const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: B
       {isOpen && (
         <>
           <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
-          <div className="absolute top-full right-0 mt-2 w-40 bg-surface border border-border-subtle rounded-xl shadow-xl z-50 overflow-hidden py-1">
+          <div className="absolute top-full right-0 mt-2 min-w-[220px] bg-base border border-border-subtle rounded-xl shadow-xl z-50 overflow-hidden py-1">
             {types.map(type => {
               const Icon = type.icon;
               return (
