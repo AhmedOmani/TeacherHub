@@ -36,10 +36,11 @@ export const WaitlistProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             'Accept': 'application/json'
         },
         body: JSON.stringify({
-            _subject: "🚀 TeacherHub Pro Waitlist Lead!",
-            email: email,
-            source: sourceData,
-            user_uid: user?.uid || 'anonymous'
+            _subject: "🚀 New TeacherHub Pro Waitlist Lead!",
+            _replyto: email,
+            "User Email": email,
+            "Feature Source": sourceData,
+            "User UID": user?.uid || 'anonymous'
         })
       });
 
