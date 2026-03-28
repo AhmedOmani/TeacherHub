@@ -40,6 +40,7 @@ export const AppearanceEditor: React.FC = () => {
           label="صورة الخلفية (اختياري)"
           value={config.appearance?.backgroundUrl || ''}
           onChange={(url) => handleAppearanceChange('backgroundUrl', url)}
+          isPremium={true}
         />
 
         <div className="flex items-center justify-between p-4 bg-surface border border-border-subtle rounded-xl cursor-pointer hover:border-electric/50 transition-colors"

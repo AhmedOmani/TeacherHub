@@ -1,17 +1,23 @@
 import React, { useRef, useState } from 'react';
-import { UploadCloud, Loader2 } from 'lucide-react';
+import { UploadCloud, Loader2, Crown, Lock } from 'lucide-react';
 import { S3Client, PutObjectCommand } from '@aws-sdk/client-s3';
+import { useAuth } from '../../AuthContext';
 
 interface FileUploadProps {
   label: string;
   value: string;
   onChange: (url: string) => void;
   accept?: string;
+  isPremium?: boolean;
 }
 
-export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange, accept }) => {
+export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange, accept, isPremium }) => {
   const [isUploading, setIsUploading] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const { subscriptionStatus } = useAuth();
+  
+  const isPro = subscriptionStatus === 'pro';
+  const disabled = isPremium && !isPro;
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -100,10 +106,24 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange, 
       </div>
       
       <div 
-        onClick={() => inputRef.current?.click()}
-        className="w-full bg-base border border-dashed border-border-subtle rounded-xl px-4 py-6 text-center 
-        backdrop-blur-md cursor-pointer hover:bg-surface hover:border-electric/50 transition-all flex flex-col items-center justify-center gap-3 group"
+        onClick={() => {
+          if (!disabled) inputRef.current?.click();
+        }}
+        className={`w-full bg-base border border-dashed border-border-subtle rounded-xl px-4 py-6 text-center 
+        backdrop-blur-md relative flex flex-col items-center justify-center gap-3 transition-all group
+        ${disabled ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-surface hover:border-electric/50'}`}
       >
+        {disabled && (
+          <div className="absolute top-2 right-2">
+            <Lock size={16} className="text-text-muted" />
+          </div>
+        )}
+        {disabled && (
+          <div className="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-[220px] p-3 bg-base border border-border-subtle rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all text-center z-50 pointer-events-none">
+             <p className="text-xs font-bold text-electric mb-1 flex items-center justify-center gap-1"><Crown size={12}/> ميزة PRO</p>
+             <p className="text-[10px] text-text-muted leading-tight">الرفع المباشر متاح فقط في الباقة المدفوعة.</p>
+          </div>
+        )}
         <input 
           type="file" 
           ref={inputRef}
