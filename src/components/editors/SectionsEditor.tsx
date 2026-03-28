@@ -4,6 +4,7 @@ import { Input } from '../ui/Input';
 import { Plus, Trash2, Link, PlaySquare, FileText, Palette, ChevronDown, Film } from 'lucide-react';
 import type { Section, Block, BlockType } from '../../types';
 import { FileUpload } from '../ui/FileUpload';
+import { EmojiPicker } from '../ui/EmojiPicker';
 
 const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: BlockType) => void }) => {
   const [isOpen, setIsOpen] = React.useState(false);
@@ -202,13 +203,11 @@ export const SectionsEditor: React.FC = () => {
                     className="text-left mb-0"
                   />
                 )}
-                <div className="flex gap-3 mt-2">
-                  <Input
+                <div className="flex gap-3 mt-2 relative">
+                  <EmojiPicker
                     label="رمز (Emoji)"
                     value={block.emoji || ''}
-                    onChange={(e) => updateBlock(section.id, block.id, 'emoji', e.target.value)}
-                    placeholder="🎮"
-                    className="w-24 text-center text-2xl mb-0"
+                    onChange={(emoji) => updateBlock(section.id, block.id, 'emoji', emoji)}
                   />
                   <div className="flex-1 flex flex-col gap-2">
                     <label className="text-sm font-medium text-text-muted">لون الإطار البارز</label>

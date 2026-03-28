@@ -32,8 +32,8 @@ export const PublishEditor: React.FC = () => {
   useEffect(() => {
     if (!slug || initialLoading || !pageId) return;
 
-    // Basic format check (alphanumeric and dashes only)
-    if (!/^[a-z0-9-]+$/.test(slug)) {
+    // Basic format check (alphanumeric and dashes only, case-insensitive)
+    if (!/^[a-zA-Z0-9-]+$/.test(slug)) {
       setSlugError('الرابط يجب أن يحتوي على أحرف إنجليزية، أرقام، وشرطات (-) فقط.');
       return;
     }
