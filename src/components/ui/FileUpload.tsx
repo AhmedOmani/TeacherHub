@@ -105,42 +105,45 @@ export const FileUpload: React.FC<FileUploadProps> = ({ label, value, onChange, 
         )}
       </div>
       
-      <div 
-        onClick={() => {
-          if (!disabled) inputRef.current?.click();
-        }}
-        className={`w-full bg-base border border-dashed border-border-subtle rounded-xl px-4 py-6 text-center 
-        backdrop-blur-md relative flex flex-col items-center justify-center gap-3 transition-all group
-        ${disabled ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-surface hover:border-electric/50'}`}
-      >
-        {disabled && (
-          <div className="absolute top-2 right-2">
-            <Lock size={16} className="text-text-muted" />
+      <div className="relative w-full group">
+        <div 
+          onClick={() => {
+            if (!disabled) inputRef.current?.click();
+          }}
+          className={`w-full bg-base border border-dashed border-border-subtle rounded-xl px-4 py-6 text-center 
+          backdrop-blur-md flex flex-col items-center justify-center gap-3 transition-all
+          ${disabled ? 'opacity-70 cursor-not-allowed' : 'cursor-pointer hover:bg-surface hover:border-electric/50'}`}
+        >
+          {disabled && (
+            <div className="absolute top-2 right-2">
+              <Lock size={16} className="text-text-muted" />
+            </div>
+          )}
+          <input 
+            type="file" 
+            ref={inputRef}
+            className="hidden" 
+            accept={accept || "image/*,video/*,.pdf"} 
+            onChange={handleFileChange} 
+          />
+          
+          {isUploading ? (
+             <Loader2 className="animate-spin text-electric" size={24} />
+          ) : (
+             <UploadCloud className={`transition-colors ${disabled ? 'text-text-muted' : 'text-text-muted group-hover:text-electric'}`} size={24} />
+          )}
+          
+          <div className={`text-sm transition-colors ${disabled ? 'text-text-muted' : 'text-text-muted group-hover:text-text-main'}`}>
+             {value ? 'تم رفع الملف بنجاح (انقر لتغييره)' : 'انقر لرفع ملف'}
           </div>
-        )}
+        </div>
+
         {disabled && (
           <div className="absolute top-[calc(100%+8px)] left-1/2 -translate-x-1/2 w-[220px] p-3 bg-base border border-border-subtle rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all text-center z-50 pointer-events-none">
              <p className="text-xs font-bold text-electric mb-1 flex items-center justify-center gap-1"><Crown size={12}/> ميزة PRO</p>
              <p className="text-[10px] text-text-muted leading-tight">الرفع المباشر متاح فقط في الباقة المدفوعة.</p>
           </div>
         )}
-        <input 
-          type="file" 
-          ref={inputRef}
-          className="hidden" 
-          accept={accept || "image/*,video/*,.pdf"} 
-          onChange={handleFileChange} 
-        />
-        
-        {isUploading ? (
-           <Loader2 className="animate-spin text-electric" size={24} />
-        ) : (
-           <UploadCloud className="text-text-muted group-hover:text-electric transition-colors" size={24} />
-        )}
-        
-        <div className="text-sm text-text-muted group-hover:text-text-main transition-colors">
-           {value ? 'تم رفع الملف بنجاح (انقر لتغييره)' : 'انقر لرفع ملف'}
-        </div>
       </div>
     </div>
   );
