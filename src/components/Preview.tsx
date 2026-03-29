@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import { useConfig } from '../ConfigContext';
-import { Video, Link as LinkIcon, FormInput, MonitorPlay, Film, X, ExternalLink, FileText } from 'lucide-react';
+import { Video, Link as LinkIcon, FormInput, MonitorPlay, Film, X, ExternalLink, FileText, Gamepad2, Trophy } from 'lucide-react';
 import type { Block } from '../types';
+import { GameBlock } from './blocks/GameBlock';
+import { LeaderboardBlock } from './blocks/LeaderboardBlock';
 
 export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false }) => {
   const { config } = useConfig();
@@ -15,6 +17,9 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
       case 'canva': return <MonitorPlay className="text-purple-400" size={24} />;
       case 'video': return <Film className="text-orange-500" size={24} />;
       case 'document': return <FileText className="text-cyan-400" size={24} />;
+      case 'game': return <Gamepad2 className="text-pink-500" size={24} />;
+      case 'leaderboard': return <Trophy className="text-yellow-500" size={24} />;
+
       default: return <LinkIcon className="text-blue-400" size={24} />;
     }
   };
@@ -92,9 +97,9 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
                         target="_blank"
                         rel="noopener noreferrer"
                         onClick={(e) => {
-                          if (block.type === 'youtube' || block.type === 'video' || block.type === 'document') {
+                          if (['youtube', 'video', 'document', 'game', 'leaderboard'].includes(block.type)) {
                             e.preventDefault();
-                            if (block.url) setActiveBlock(block);
+                            if (block.url || ['game', 'leaderboard'].includes(block.type)) setActiveBlock(block);
                           }
                         }}
                         className="bg-surface/90 backdrop-blur-xl border-t border-r border-l border-b-[8px] rounded-[24px] px-8 py-6 hover:translate-y-[2px] hover:border-b-[6px] active:translate-y-[6px] active:border-b-[2px] transition-all duration-150 cursor-pointer group flex items-center justify-between relative overflow-hidden"
@@ -102,8 +107,8 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
                      >
                         <div className="flex-1 text-right">
                           <h3 className="text-2xl font-bold mb-1 text-text-main group-hover:opacity-80 transition-opacity">{block.title || 'رابط جديد'}</h3>
-                          <p className="text-sm font-medium" style={{ color: block.borderColor || '#64748b' }}>
-                            اضغط للعب 🎮
+                          <p className="text-sm font-medium opacity-80" dir="ltr" style={{ color: block.borderColor || 'var(--text-muted)' }}>
+                            {block.type === 'game' ? 'اضغط للعب 🎮' : block.type === 'leaderboard' ? 'عرض المتصدرين 🏆' : block.url || 'لا يوجد رابط'}
                           </p>
                         </div>
                         
@@ -138,16 +143,18 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
                 {activeBlock.title || 'عرض المحتوى'}
               </h3>
               <div className="flex items-center gap-3">
-                <a 
-                  href={activeBlock.url} 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="p-2 rounded-xl bg-base hover:bg-border-subtle text-text-muted hover:text-text-main transition-colors flex items-center gap-2 text-sm font-medium"
-                  title="فتح في نافذة جديدة"
-                >
-                  <ExternalLink size={18} />
-                  <span>فتح في متصفح جديد</span>
-                </a>
+                {!['game', 'leaderboard'].includes(activeBlock.type) && (
+                  <a 
+                    href={activeBlock.url}  
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="p-2 rounded-xl bg-base hover:bg-border-subtle text-text-muted hover:text-text-main transition-colors flex items-center gap-2 text-sm font-medium"
+                    title="فتح في نافذة جديدة"
+                  >
+                    <ExternalLink size={18} />
+                    <span>فتح في متصفح جديد</span>
+                  </a>
+                )}
                 <button 
                   onClick={() => setActiveBlock(null)}
                   className="p-2 rounded-xl bg-red-500/10 text-red-500 hover:bg-red-500 hover:text-white transition-colors"
@@ -158,7 +165,7 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
             </div>
             
             {/* Modal Body */}
-            <div className="flex-1 bg-black relative">
+            <div className="flex-1 min-h-0 bg-base relative rounded-b-3xl overflow-hidden">
               {activeBlock.type === 'youtube' ? (() => {
                 let videoId = '';
                 if (activeBlock.url.includes('v=')) videoId = activeBlock.url.split('v=')[1]?.split('&')[0];
@@ -166,7 +173,11 @@ export const Preview: React.FC<{ isViewMode?: boolean }> = ({ isViewMode = false
                 
                 const embedUrl = videoId ? `https://www.youtube.com/embed/${videoId}?autoplay=1` : activeBlock.url;
                 return <iframe src={embedUrl} className="w-full h-full border-0" allowFullScreen allow="autoplay; encrypted-media" />;
-              })() : activeBlock.type === 'video' ? (
+              })() : activeBlock.type === 'game' ? (
+                <GameBlock block={activeBlock} />
+              ) : activeBlock.type === 'leaderboard' ? (
+                <LeaderboardBlock block={activeBlock} />
+              ) : activeBlock.type === 'video' ? (
                 <video src={activeBlock.url} controls autoPlay className="w-full h-full object-contain" />
               ) : activeBlock.type === 'google-form' ? (
                 <iframe src={activeBlock.url.includes('?') ? `${activeBlock.url}&embedded=true` : `${activeBlock.url}?embedded=true`} className="w-full h-full border-0 bg-white" allowFullScreen />

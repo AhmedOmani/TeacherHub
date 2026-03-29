@@ -10,6 +10,7 @@ interface ConfigContextType {
   setConfig: React.Dispatch<React.SetStateAction<ConfigObj>>;
   loading: boolean;
   error: string | null;
+  pageId?: string;
 }
 
 const ConfigContext = createContext<ConfigContextType | undefined>(undefined);
@@ -100,7 +101,7 @@ export const ConfigProvider: React.FC<ConfigProviderProps> = ({ children, pageId
   }
 
   return (
-    <ConfigContext.Provider value={{ config, setConfig, loading, error }}>
+    <ConfigContext.Provider value={{ config, setConfig, loading, error, pageId }}>
       {children}
     </ConfigContext.Provider>
   );

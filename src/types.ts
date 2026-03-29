@@ -1,4 +1,19 @@
-export type BlockType = 'youtube' | 'link' | 'google-form' | 'canva' | 'video' | 'document';
+export type BlockType = 'youtube' | 'link' | 'google-form' | 'canva' | 'video' | 'document' | 'game' | 'leaderboard';
+
+export interface GamePair {
+  id: string;
+  question: string;
+  answer: string;
+}
+
+export type GameMode = 'flashcards' | 'memory' | 'match' | 'sort';
+
+export interface LeaderboardStudent {
+  id: string;
+  name: string;
+  score: number;
+}
+
 
 export interface Block {
   id: string;
@@ -7,6 +22,10 @@ export interface Block {
   url: string;
   emoji?: string;
   borderColor?: string;
+  gameType?: GameMode;
+  gamePairs?: GamePair[];
+  students?: LeaderboardStudent[];
+
 }
 
 export interface Section {

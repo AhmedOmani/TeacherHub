@@ -3,8 +3,9 @@ import { useParams } from 'react-router-dom';
 import { ConfigProvider } from '../ConfigContext';
 import { Preview } from '../components/Preview';
 import { ThemeToggle } from '../components/ThemeToggle';
-import { db } from '../lib/firebase';
+import { db, auth } from '../lib/firebase';
 import { collection, query, where, getDocs } from 'firebase/firestore';
+import { signInAnonymously } from 'firebase/auth';
 import { Loader2 } from 'lucide-react';
 
 export function Viewer() {
@@ -20,6 +21,13 @@ export function Viewer() {
       }
       
       try {
+        // Ensure the viewer has an anonymous session to bypass security blockades for Polls/Vault blocks
+        try {
+          await signInAnonymously(auth);
+        } catch (authErr) {
+          console.warn("Anonymous auth failed (might be disabled in Firebase Console):", authErr);
+        }
+
         const q = query(collection(db, 'pages'), where('slug', '==', slug), where('isPublished', '==', true));
         const querySnapshot = await getDocs(q);
         

@@ -1,10 +1,12 @@
 import React from 'react';
 import { useConfig } from '../../ConfigContext';
 import { Input } from '../ui/Input';
-import { Plus, Trash2, Link, PlaySquare, FileText, Palette, ChevronDown, Film, Crown, Lock } from 'lucide-react';
+import { Plus, Trash2, Link, PlaySquare, FileText, Palette, ChevronDown, Film, Crown, Lock, Gamepad2, Edit3, Trophy } from 'lucide-react';
 import type { Section, Block, BlockType } from '../../types';
 import { FileUpload } from '../ui/FileUpload';
 import { EmojiPicker } from '../ui/EmojiPicker';
+import { GameEditor } from './GameEditor';
+import { LeaderboardEditor } from './LeaderboardEditor';
 import { useAuth } from '../../AuthContext';
 import { useWaitlist } from '../../WaitlistContext';
 
@@ -19,6 +21,8 @@ const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: B
     { id: 'youtube', icon: PlaySquare, label: 'يوتيوب', color: 'text-red-500' },
     { id: 'google-form', icon: FileText, label: 'نموذج جوجل', color: 'text-emerald-500' },
     { id: 'canva', icon: Palette, label: 'تصميم كانفا', color: 'text-purple-400' },
+    { id: 'game', icon: Gamepad2, label: 'لعبة تفاعلية', color: 'text-pink-500', isPremium: true },
+    { id: 'leaderboard', icon: Trophy, label: 'لوحة المتصدرين', color: 'text-yellow-500', isPremium: true },
     { id: 'video', icon: Film, label: 'فيديو خاص', color: 'text-orange-500', isPremium: true },
     { id: 'document', icon: FileText, label: 'ملف (PPTX/DOCX/PDF)', color: 'text-cyan-400', isPremium: true },
   ];
@@ -56,7 +60,7 @@ const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: B
                       setIsOpen(false);
                     }
                   }}
-                  className={`w-full flex items-center justify-between px-3 py-2 text-sm transition-colors group relative ${value === type.id ? 'bg-base/50' : ''} ${disabled ? 'opacity-80 cursor-pointer hover:bg-surface' : 'hover:bg-base cursor-pointer'}`}
+                  className={`w-full flex items-center justify-between px-3 py-2 text-sm transition-colors group/type-item relative ${value === type.id ? 'bg-base/50' : ''} ${disabled ? 'opacity-80 cursor-pointer hover:bg-surface' : 'hover:bg-base cursor-pointer'}`}
                 >
                   <div className="flex items-center gap-2">
                     <Icon size={16} className={type.color} />
@@ -68,7 +72,7 @@ const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: B
                     </div>
                   )}
                   {disabled && (
-                    <div className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 w-[200px] p-3 bg-base border border-border-subtle rounded-xl shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all text-center z-50 pointer-events-none">
+                    <div className="absolute right-[calc(100%+8px)] top-1/2 -translate-y-1/2 w-[200px] p-3 bg-base border border-border-subtle rounded-xl shadow-xl opacity-0 invisible group-hover/type-item:opacity-100 group-hover/type-item:visible transition-all text-center z-50 pointer-events-none">
                        <p className="text-xs font-bold text-electric mb-1 flex items-center justify-center gap-1"><Crown size={12}/> ميزة PRO</p>
                        <p className="text-[10px] text-text-muted leading-tight">الرفع المباشر (S3) متاح في الباقة المدفوعة.</p>
                     </div>
@@ -85,6 +89,11 @@ const BlockTypeSelector = ({ value, onChange }: { value: string, onChange: (v: B
 
 export const SectionsEditor: React.FC = () => {
   const { config, setConfig } = useConfig();
+  const { subscriptionStatus } = useAuth();
+  const { openWaitlist } = useWaitlist();
+  const isPro = subscriptionStatus === 'pro';
+  const [editingGameBlock, setEditingGameBlock] = React.useState<{ sectionId: string; blockId: string; } | null>(null);
+  const [editingLeaderboardBlock, setEditingLeaderboardBlock] = React.useState<{ sectionId: string; blockId: string; } | null>(null);
 
   const addSection = () => {
     const newSection: Section = { id: `sec-${Date.now()}`, title: 'قسم جديد', blocks: [] };
@@ -145,6 +154,33 @@ export const SectionsEditor: React.FC = () => {
       )
     }));
   };
+
+  const handleSaveGame = (sectionId: string, blockId: string, pairs: any, gameType: any) => {
+    setConfig((prev) => ({
+      ...prev,
+      sections: prev.sections.map(s => 
+        s.id === sectionId ? {
+          ...s,
+          blocks: s.blocks.map(b => b.id === blockId ? { ...b, gamePairs: pairs, gameType } : b)
+        } : s
+      )
+    }));
+    setEditingGameBlock(null);
+  };
+
+  const handleSaveLeaderboard = (sectionId: string, blockId: string, updates: Partial<Block>) => {
+    setConfig((prev) => ({
+      ...prev,
+      sections: prev.sections.map(s => 
+        s.id === sectionId ? {
+          ...s,
+          blocks: s.blocks.map(b => b.id === blockId ? { ...b, ...updates } : b)
+        } : s
+      )
+    }));
+    setEditingLeaderboardBlock(null);
+  };
+
 
   return (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -222,6 +258,44 @@ export const SectionsEditor: React.FC = () => {
                     onChange={(url) => updateBlock(section.id, block.id, 'url', url)}
                     accept={block.type === 'video' ? 'video/*' : '.pdf,.doc,.docx,.ppt,.pptx'}
                   />
+                ) : block.type === 'game' ? (
+                  <div className="flex flex-col gap-2 p-4 bg-pink-500/5 border border-pink-500/20 rounded-xl relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-2 h-full bg-pink-500/50" />
+                    <p className="text-sm text-text-main font-bold flex items-center gap-2">
+                       <Gamepad2 size={18} className="text-pink-500" /> إعدادات اللعبة التفاعلية
+                    </p>
+                    <p className="text-xs text-text-muted">تحتوي هذه اللعبة على {block.gamePairs?.length || 0} بطاقات معرفية</p>
+                    <button 
+                      onClick={() => isPro ? setEditingGameBlock({ sectionId: section.id, blockId: block.id }) : openWaitlist('Game Block - لعبة تفاعلية')}
+                      className={`mt-3 w-full py-2.5 font-bold rounded-xl transition-all flex justify-center items-center gap-2 shadow-md ${
+                        isPro
+                          ? 'bg-electric hover:bg-electric/90 text-white shadow-electric/20'
+                          : 'bg-surface border border-border-subtle text-text-muted cursor-pointer hover:border-electric/50'
+                      }`}
+                    >
+                      {isPro ? <Edit3 size={16} /> : <Lock size={16} />}
+                      {isPro ? 'تعديل الأسئلة ونوع اللعبة' : 'ميزة PRO — اشترك للوصول'}
+                    </button>
+                  </div>
+                ) : block.type === 'leaderboard' ? (
+                  <div className="flex flex-col gap-2 p-4 bg-yellow-500/5 border border-yellow-500/20 rounded-xl relative overflow-hidden group">
+                    <div className="absolute top-0 left-0 w-2 h-full bg-yellow-500/50" />
+                    <p className="text-sm text-text-main font-bold flex items-center gap-2">
+                       <Trophy size={18} className="text-yellow-500" /> لوحة المتصدرين
+                    </p>
+                    <p className="text-xs text-text-muted">تحتوي هذه اللوحة على {block.students?.length || 0} طلاب مسجلين</p>
+                    <button 
+                      onClick={() => isPro ? setEditingLeaderboardBlock({ sectionId: section.id, blockId: block.id }) : openWaitlist('Leaderboard Block - لوحة المتصدرين')}
+                      className={`mt-3 w-full py-2.5 font-bold rounded-xl transition-all flex justify-center items-center gap-2 shadow-md ${
+                        isPro
+                          ? 'bg-yellow-500 hover:bg-yellow-600 text-white shadow-yellow-500/20'
+                          : 'bg-surface border border-border-subtle text-text-muted cursor-pointer hover:border-yellow-500/50'
+                      }`}
+                    >
+                      {isPro ? <Trophy size={16} /> : <Lock size={16} />}
+                      {isPro ? 'إدارة الطلاب والنقاط' : 'ميزة PRO — اشترك للوصول'}
+                    </button>
+                  </div>
                 ) : (
                   <Input
                     label="الرابط (URL)"
@@ -267,6 +341,31 @@ export const SectionsEditor: React.FC = () => {
       >
         <Plus size={18} /> قسم جديد
       </button>
+
+      {/* Game Editor Modal */}
+      {editingGameBlock && (
+        <GameEditor 
+          initialPairs={config.sections.find(s => s.id === editingGameBlock.sectionId)?.blocks.find(b => b.id === editingGameBlock.blockId)?.gamePairs || []}
+          initialMode={config.sections.find(s => s.id === editingGameBlock.sectionId)?.blocks.find(b => b.id === editingGameBlock.blockId)?.gameType || 'flashcards'}
+          onSave={(pairs, mode) => handleSaveGame(editingGameBlock.sectionId, editingGameBlock.blockId, pairs, mode)}
+          onClose={() => setEditingGameBlock(null)}
+        />
+      )}
+
+      {/* Leaderboard Editor Modal */}
+      {editingLeaderboardBlock && (() => {
+        const blk = config.sections.find(s => s.id === editingLeaderboardBlock.sectionId)?.blocks.find(b => b.id === editingLeaderboardBlock.blockId);
+        if (!blk) return null;
+        return (
+          <LeaderboardEditor 
+            block={blk}
+            onSave={(updates) => handleSaveLeaderboard(editingLeaderboardBlock.sectionId, editingLeaderboardBlock.blockId, updates)}
+            onClose={() => setEditingLeaderboardBlock(null)}
+          />
+        );
+      })()}
+
+
     </div>
   );
 };

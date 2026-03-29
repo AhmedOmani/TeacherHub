@@ -14,6 +14,7 @@ const navItems = [
   { id: 'sections', label: 'الاقسام', icon: LayoutGrid },
   { id: 'appearance', label: 'المظهر', icon: Palette },
   { id: 'publishing', label: 'النشر', icon: Send },
+
 ] as const;
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, onSelectTab }) => {
